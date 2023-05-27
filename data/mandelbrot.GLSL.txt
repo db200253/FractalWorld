@@ -1,0 +1,50 @@
+#ifdef GL_ES
+precision mediump float;
+precision mediump int;
+#endif
+
+// common attributes for all pixels
+uniform vec2 size;
+uniform int nMax;
+uniform vec2 zMin;
+uniform vec2 zMax;
+uniform bool julia;
+uniform vec2 juliaC;
+
+// Conversion HSV -> RGB
+// manually converting colors into RGB
+vec3 hsv2rgb(vec3 c) {
+  vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+  vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+  return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+
+int itererSuite(vec2 z0, vec2 c) {
+  vec2 z = z0;
+  int n = 0;
+  while (n < nMax && dot(z, z) < 4.0) {
+    z = vec2(z.x * z.x - z.y * z.y, 2 * z.x * z.y) + c;
+    n++;
+  }
+  return n;
+}
+
+void main() {
+  // complex number at (x,y) position
+  vec2 z = zMin + (zMax - zMin) * gl_FragCoord.xy / size;
+  int n;
+  // Iterate
+  if (julia) {
+    n = itererSuite(z, juliaC);
+  } else {
+    n = itererSuite(vec2(0.0), z);
+  }
+  // if suite don't diverge -> black pixel
+  // else color depending of the number of iteration
+  if (n == nMax) {
+    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+  } else {
+    gl_FragColor = vec4(hsv2rgb(vec3(float(n) / nMax, 1.0, 1.0)), 1.0);
+  }
+}
