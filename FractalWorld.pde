@@ -4,7 +4,6 @@ void setup() {
   // P2D = accelerate 
   // higher resolution
   size(960, 720, P2D);
-  // nmax = 300 thank you GPU, it's high but who cares ? 
   mandel = new Mandelbrot(-2.5, -1.5, 4, 300);
   mandel.dessiner();
 }
@@ -19,7 +18,7 @@ void draw() {
   //}
 }
 
-// Zoom : no zoom, no party ;)
+// Zoom 
 void mouseWheel(MouseEvent event) {
   mandel.zoom(mouseX, mouseY, 1 - event.getCount() / 10.0);
   mandel.dessiner();
